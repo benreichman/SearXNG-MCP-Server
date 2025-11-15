@@ -27,6 +27,7 @@ DEFAULT_MAX_RESULTS = 5
 DEFAULT_MAX_WORDS = 5000
 REQUEST_TIMEOUT = 20
 SERVER_PORT = 8765
+USE_TOR = False  # Set to True to route scraping requests through Tor (requires Tor running on 127.0.0.1:9050)
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -59,11 +60,19 @@ class MCPResponse(BaseModel):
 
 class WebSearchTools:
     """Web search and scraping utilities"""
-    
+
     def __init__(self):
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
         }
+        # Configure Tor proxy if enabled
+        self.proxies = None
+        if USE_TOR:
+            self.proxies = {
+                'http': 'socks5://127.0.0.1:9050',
+                'https': 'socks5://127.0.0.1:9050'
+            }
+            logger.info("Tor proxy enabled for scraping requests")
     
     def remove_emojis(self, text: str) -> str:
         """Remove emojis from text"""
@@ -100,6 +109,7 @@ class WebSearchTools:
                 SEARXNG_BASE_URL,
                 params=params,
                 headers=self.headers,
+                proxies=self.proxies,
                 timeout=REQUEST_TIMEOUT
             )
             response.raise_for_status()
@@ -130,7 +140,7 @@ class WebSearchTools:
     async def scrape_url(self, url: str, title: str = "", snippet: str = "") -> Optional[Dict[str, Any]]:
         """Scrape content from a specific URL"""
         try:
-            response = requests.get(url, headers=self.headers, timeout=REQUEST_TIMEOUT)
+            response = requests.get(url, headers=self.headers, proxies=self.proxies, timeout=REQUEST_TIMEOUT)
             response.raise_for_status()
             
             soup = BeautifulSoup(response.text, "html.parser")

@@ -7,6 +7,7 @@ A Model Context Protocol (MCP) server that provides web search and scraping capa
 - **Web Search**: Search across multiple engines (DuckDuckGo, Google, Bing, Brave) via SearXNG
 - **Content Scraping**: Automatically scrape and format content from search results
 - **Direct URL Scraping**: Extract content from specific URLs
+- **Tor Support**: Optional anonymous scraping through Tor network
 - **MCP Protocol**: Full implementation of MCP HTTP protocol for seamless AI assistant integration
 - **Clean Text Extraction**: Remove emojis, normalize formatting, and limit word count
 
@@ -36,7 +37,18 @@ DEFAULT_MAX_RESULTS = 5                            # Default search results
 DEFAULT_MAX_WORDS = 5000                           # Max words per page
 REQUEST_TIMEOUT = 20                               # Request timeout (seconds)
 SERVER_PORT = 8765                                 # Server port
+USE_TOR = False                                    # Route scraping through Tor (requires Tor on 127.0.0.1:9050)
 ```
+
+### Tor Support
+
+To enable anonymous scraping through Tor:
+
+1. Install and start Tor service (must be running on `127.0.0.1:9050`)
+2. Set `USE_TOR = True` in the configuration
+3. Restart the server
+
+When enabled, all web scraping requests will be routed through the Tor network.
 
 ## Usage
 
